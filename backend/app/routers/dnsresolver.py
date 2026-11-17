@@ -30,15 +30,6 @@ def list_entries(
     return PageResult(items=items, total=total, page=page, size=size)
 
 
-@router.get("/{entry_id}", response_model=dict)
-def get_entry(entry_id: int) -> dict:
-    """读取单条解析配置明细；不存在时给出可读的错误说明。"""
-    entry = service.get_entry(entry_id)
-    if entry is None:
-        raise HTTPException(status_code=404, detail=f"解析配置 {entry_id} 不存在或已归档")
-    return entry
-
-
 @router.post("", response_model=ActionResult)
 def create_entry(payload: EntryPayload) -> ActionResult:
     """登记一条解析配置，缺字段时说明原因而不是静默丢弃。"""
@@ -58,8 +49,27 @@ def run_action(entry_id: int, payload: EntryPayload) -> ActionResult:
     return ActionResult(ok=True, message=message, entry=entry)
 
 
+@router.post("/{entry_id}/versions", response_model=ActionResult)
+def publish_version(entry_id: int, payload: EntryPayload) -> ActionResult:
+    """发布解析配置新版本：升版本号并失效旧缓存，旧请求不会再把地址写回新版本。"""
+    entry, message = service.publish_version(entry_id, payload.values)
+    if entry is None:
+        return ActionResult(ok=False, message=message)
+    return ActionResult(ok=True, message=message, entry=entry)
+
+
 @router.get("/export")
 def export_entries() -> dict[str, Any]:
     """导出DNS解析清单：返回当前过滤条件下的全量数据。"""
     items, total = service.list_entries(page=1, size=10000)
     return {"module": "dnsresolver", "total": total, "items": items}
+
+
+# 带路径参数的详情接口放在静态路径之后，避免 /export 被 int 解析拦成 422。
+@router.get("/{entry_id}", response_model=dict)
+def get_entry(entry_id: int) -> dict:
+    """读取单条解析配置明细；不存在时给出可读的错误说明。"""
+    entry = service.get_entry(entry_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail=f"解析配置 {entry_id} 不存在或已归档")
+    return entry

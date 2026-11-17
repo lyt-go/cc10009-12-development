@@ -617,3 +617,9 @@ SEED_ROWS: dict[str, list[dict[str, Any]]] = {
   '升级规则': '采集告警样例3',
   '修复建议链接': '采集告警样例3'}]
 }
+
+# DNS 解析结果追踪相关的表与更完整的解析配置（含配置版本、主备地址、重试上限）。
+# 放在文件末尾覆盖基础示例，保证 store 初始化时拿到的是可解析的真实数据。
+from app.seed_dns import DNS_FEATURE_SEED_ROWS
+
+SEED_ROWS.update(DNS_FEATURE_SEED_ROWS)

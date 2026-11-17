@@ -11,6 +11,7 @@ from app.routers import dispatch as router_dispatch
 from app.routers import crawljob as router_crawljob
 from app.routers import urlfilter as router_urlfilter
 from app.routers import dnsresolver as router_dnsresolver
+from app.routers import dnsresult as router_dnsresult
 from app.routers import contentextract as router_contentextract
 from app.routers import storagestrategy as router_storagestrategy
 from app.routers import rendertask as router_rendertask
@@ -24,4 +25,4 @@ from app.routers import scrapeapi as router_scrapeapi
 from app.routers import datasample as router_datasample
 from app.routers import alertpolicy as router_alertpolicy
 
-ROUTERS = [router_worker, router_dispatch, router_crawljob, router_urlfilter, router_dnsresolver, router_contentextract, router_storagestrategy, router_rendertask, router_qualityreport, router_bandwidth, router_retryqueue, router_pagemarker, router_incrementmark, router_configsync, router_scrapeapi, router_datasample, router_alertpolicy]
+ROUTERS = [router_worker, router_dispatch, router_crawljob, router_urlfilter, router_dnsresolver, router_dnsresult, router_contentextract, router_storagestrategy, router_rendertask, router_qualityreport, router_bandwidth, router_retryqueue, router_pagemarker, router_incrementmark, router_configsync, router_scrapeapi, router_datasample, router_alertpolicy]

@@ -7,6 +7,7 @@ import DispatchView from './views/dispatch'
 import CrawljobView from './views/crawljob'
 import UrlfilterView from './views/urlfilter'
 import DnsresolverView from './views/dnsresolver'
+import DnsresultView from './views/dnsresult'
 import ContentextractView from './views/contentextract'
 import StoragestrategyView from './views/storagestrategy'
 import RendertaskView from './views/rendertask'
@@ -20,7 +21,7 @@ import ScrapeapiView from './views/scrapeapi'
 import DatasampleView from './views/datasample'
 import AlertpolicyView from './views/alertpolicy'
 
-const navItems = [{ label: "运营概览", path: "/" }, { label: "采集节点", path: "/worker" }, { label: "请求分配", path: "/dispatch" }, { label: "抓取作业", path: "/crawljob" }, { label: "URL过滤", path: "/urlfilter" }, { label: "DNS解析", path: "/dnsresolver" }, { label: "内容提取", path: "/contentextract" }, { label: "存储策略", path: "/storagestrategy" }, { label: "渲染任务", path: "/rendertask" }, { label: "采集质量", path: "/qualityreport" }, { label: "带宽控制", path: "/bandwidth" }, { label: "重试队列", path: "/retryqueue" }, { label: "翻页管理", path: "/pagemarker" }, { label: "增量标记", path: "/incrementmark" }, { label: "配置同步", path: "/configsync" }, { label: "采集API", path: "/scrapeapi" }, { label: "数据抽样", path: "/datasample" }, { label: "采集告警", path: "/alertpolicy" }]
+const navItems = [{ label: "运营概览", path: "/" }, { label: "采集节点", path: "/worker" }, { label: "请求分配", path: "/dispatch" }, { label: "抓取作业", path: "/crawljob" }, { label: "URL过滤", path: "/urlfilter" }, { label: "DNS解析", path: "/dnsresolver" }, { label: "DNS解析结果", path: "/dnsresult" }, { label: "内容提取", path: "/contentextract" }, { label: "存储策略", path: "/storagestrategy" }, { label: "渲染任务", path: "/rendertask" }, { label: "采集质量", path: "/qualityreport" }, { label: "带宽控制", path: "/bandwidth" }, { label: "重试队列", path: "/retryqueue" }, { label: "翻页管理", path: "/pagemarker" }, { label: "增量标记", path: "/incrementmark" }, { label: "配置同步", path: "/configsync" }, { label: "采集API", path: "/scrapeapi" }, { label: "数据抽样", path: "/datasample" }, { label: "采集告警", path: "/alertpolicy" }]
 
 export default function App() {
   const [operator] = useState('值班管理员')
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/crawljob" element={<CrawljobView />} />
           <Route path="/urlfilter" element={<UrlfilterView />} />
           <Route path="/dnsresolver" element={<DnsresolverView />} />
+          <Route path="/dnsresult" element={<DnsresultView />} />
           <Route path="/contentextract" element={<ContentextractView />} />
           <Route path="/storagestrategy" element={<StoragestrategyView />} />
           <Route path="/rendertask" element={<RendertaskView />} />

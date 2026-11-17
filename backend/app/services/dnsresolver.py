@@ -59,3 +59,59 @@ class DnsresolverService:
         entry["pending"] = target != STATUS_ORDER[-1]
         entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"解析配置已{action}"
+
+    # 允许通过版本发布更新的字段；域名模式即「绑定域名」，变更同样要求升版本。
+    PUBLISH_FIELDS = [
+        "域名模式",
+        "DNS服务器",
+        "解析超时毫秒",
+        "缓存TTL秒",
+        "A记录策略",
+        "IPv6优先",
+        "故障转移地址",
+        "主解析地址",
+        "IPv6地址",
+        "故障转移DNS服务器",
+        "重试上限",
+        "主解析状态",
+        "故障转移状态",
+    ]
+
+    def publish_version(self, entry_id: int, values: dict[str, Any]) -> tuple[dict[str, Any] | None, str]:
+        """发布配置新版本：升版本号并让旧缓存立即失效，旧请求无法再回写新版本地址。
+
+        未提供任何可发布字段时不做空发布，避免版本号无意义地增长。
+        """
+        entry = store.find(MODULE, entry_id)
+        if entry is None:
+            return None, f"解析配置 {entry_id} 不存在或已归档"
+        updates = {
+            field: values[field]
+            for field in self.PUBLISH_FIELDS
+            if field in values and values[field] is not None
+        }
+        if not updates:
+            return None, "没有可发布的配置字段，版本未变更"
+        changed = {
+            field: {"旧值": entry.get(field), "新值": value}
+            for field, value in updates.items()
+            if str(entry.get(field) or "") != str(value or "")
+        }
+        if not changed:
+            return entry, "配置字段无变化，版本未变更"
+        entry.update(updates)
+        entry["配置版本"] = int(entry.get("配置版本") or 0) + 1
+        from datetime import datetime, timezone
+
+        entry["版本更新时间"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        # 配置切换后旧缓存不能再被复用：标为失效并记录原因。
+        from app.services.dnsresult import DnsresultService
+
+        invalidated = DnsresultService().invalidate_domain_caches(
+            str(entry.get("域名模式") or ""),
+            reason="CONFIG_VERSION_MISMATCH",
+        )
+        return entry, (
+            f"解析配置已发布到 v{entry['配置版本']}，"
+            f"变更字段 {len(changed)} 项，失效缓存 {invalidated} 条"
+        )

@@ -8,6 +8,10 @@ from typing import Any
 
 from app.seed import SEED_ROWS
 
+# 支撑表不单独出现在运营概览的「业务模块」里：它们是DNS解析结果的内部证据，
+# 通过 dnsresult 接口与页面一起呈现。
+INTERNAL_MODULES = {"dnscache", "dnsbatch", "executioncoord", "crawlrecord"}
+
 
 class Store:
     def __init__(self) -> None:
@@ -17,6 +21,9 @@ class Store:
 
     def module_names(self) -> list[str]:
         return sorted(self._tables)
+
+    def overview_modules(self) -> list[str]:
+        return [name for name in self.module_names() if name not in INTERNAL_MODULES]
 
     def rows(self, module: str) -> list[dict[str, Any]]:
         return self._tables.setdefault(module, [])
@@ -29,7 +36,7 @@ class Store:
 
     def overview(self) -> dict[str, object]:
         modules: list[dict[str, object]] = []
-        for name in self.module_names():
+        for name in self.overview_modules():
             rows = self.rows(name)
             modules.append({
                 "name": name,
